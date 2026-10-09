@@ -74,6 +74,9 @@ Constraints:
 - Clarity beats concept. The user rejected a ledger-themed build as "confusing
   for a client". The page must be understood without explanation: conventional
   structure, obvious hierarchy, no metaphor carrying the layout.
+- No numbers in the copy. The user asked to drop counts and quantities from the
+  page: no number of projects, no stars, no language totals, not even the year
+  in the footer. Claims stay qualitative but concrete.
 
 ## Evidence on Hand
 

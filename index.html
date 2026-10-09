@@ -6,12 +6,12 @@
 <title>SeoMavares · Software a medida</title>
 <meta name="description" content="Apps Android, backends y paneles web a medida. Un solo desarrollador, de la idea a la publicación. Trabajo con el código abierto.">
 <meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#0a0a0b">
+<meta name="theme-color" content="#050505">
 <meta property="og:type" content="website">
 <meta property="og:title" content="SeoMavares · Software a medida">
 <meta property="og:description" content="Apps Android, backends y paneles web a medida. Un solo desarrollador, de la idea a la publicación.">
 <meta property="og:url" content="https://seomavares.github.io/">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cpath d='M16 7l6 9-6 9-6-9z' fill='%23f0b03a'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23050505'/%3E%3Cpath d='M16 7l6 9-6 9-6-9z' fill='%23f0b03a'/%3E%3C/svg%3E">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="https://cdn.jsdelivr.net/npm/@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-wght-normal.woff2">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="https://cdn.jsdelivr.net/npm/@fontsource-variable/spline-sans-mono/files/spline-sans-mono-latin-wght-normal.woff2">
 <script>document.documentElement.classList.add('js');</script>
@@ -31,24 +31,32 @@
     font-display: swap;
   }
 
-  /* Un solo acento sobre negro. La elevacion se declara una sola vez: borde,
-     nunca borde mas sombra. Radios: paneles 16px, controles en pastilla. */
+  /* Vibe: Ethereal Glass. Negro OLED, brillos radiales muy bajos, tarjetas de
+     terciopelo con doble bisel. Layout: bento asimetrico.
+     Radios: cascara 2rem, nucleo concentrico. Botones y etiquetas en pastilla. */
   :root {
-    --bg: #0a0a0b;
-    --surface: #121214;
-    --surface-2: #17171a;
-    --line: #26262b;
-    --line-2: #33333a;
-    --text: #f4f3f1;
-    --muted: #a2a09b;
+    --bg: #050505;
+    --shell-bg: rgb(255 255 255 / .04);
+    --shell-ring: rgb(255 255 255 / .09);
+    --shell-ring-2: rgb(255 255 255 / .16);
+    --core: #0b0b0c;
+    --core-2: #101012;
+    --inset: inset 0 1px 1px rgb(255 255 255 / .06);
+    --text: #f5f4f2;
+    --muted: #a3a19c;
     --accent: #f0b03a;
     --accent-ink: #1a1103;
 
-    --r-panel: 16px;
-    --r-pill: 999px;
+    --shell-r: 2rem;
+    --core-r: calc(var(--shell-r) - .5rem);
+    --pill: 999px;
 
+    --ease-fluid: cubic-bezier(.32, .72, 0, 1);
     --ease-out: cubic-bezier(.23, 1, .32, 1);
-    --ease-in-out: cubic-bezier(.77, 0, .175, 1);
+
+    --z-nav: 40;
+    --z-grain: 50;
+    --z-menu: 60;
 
     color-scheme: dark;
   }
@@ -70,482 +78,780 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Superficies del navegador, para que tambien esten disenadas. */
+  /* Superficies del navegador, tambien disenadas. */
   ::selection { background: var(--accent); color: var(--accent-ink); }
   body { caret-color: var(--accent); }
-  html { scrollbar-color: #3b3b42 var(--bg); scrollbar-width: thin; }
+  html { scrollbar-color: #35353a var(--bg); scrollbar-width: thin; }
   ::-webkit-scrollbar { width: 12px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: #3b3b42; border: 3px solid var(--bg); border-radius: var(--r-pill); }
-  ::-webkit-scrollbar-thumb:hover { background: #4c4c55; }
-
-  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb { background: #35353a; border: 3px solid var(--bg); border-radius: var(--pill); }
+  ::-webkit-scrollbar-thumb:hover { background: #4a4a52; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
 
   h1, h2, h3, p, ul, li { margin: 0; }
   ul { padding: 0; list-style: none; }
-  img { display: block; max-width: 100%; }
   a { color: inherit; }
+  img { display: block; max-width: 100%; }
+
+  /* ---------- Brillo de fondo y grano: solo elementos fijos ---------- */
+  .glow {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(46rem 30rem at 18% -6%, rgb(240 176 58 / .1), transparent 62%),
+      radial-gradient(40rem 26rem at 88% 8%, rgb(150 190 255 / .06), transparent 60%),
+      radial-gradient(52rem 34rem at 50% 108%, rgb(240 176 58 / .05), transparent 66%);
+  }
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-grain);
+    pointer-events: none;
+    opacity: .026;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .grain { display: none; }
+  }
+
+  .page { position: relative; z-index: 1; }
 
   .wrap {
     width: 100%;
-    max-width: 1150px;
+    max-width: 1240px;
     margin-inline: auto;
-    padding-inline: clamp(22px, 5vw, 40px);
+    padding-inline: clamp(1.25rem, 5vw, 2.5rem);
   }
-  section[id] { scroll-margin-top: 84px; }
 
-  .skip {
-    position: absolute;
-    left: -9999px;
-    top: 0;
-    z-index: 20;
-    padding: .7rem 1rem;
-    background: var(--accent);
-    color: var(--accent-ink);
-    border-radius: 0 0 var(--r-panel) 0;
+  /* ---------- Isla de navegacion: pastilla flotante, no barra pegada ---------- */
+  .nav-slot { position: sticky; top: 1.25rem; z-index: var(--z-nav); padding-inline: clamp(1rem, 4vw, 2rem); }
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    width: max-content;
+    max-width: 100%;
+    margin-inline: auto;
+    padding: .5rem .5rem .5rem 1.35rem;
+    border: 1px solid var(--shell-ring);
+    border-radius: var(--pill);
+    background: rgb(12 12 13 / .62);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    backdrop-filter: blur(24px) saturate(140%);
+    box-shadow: var(--inset), 0 24px 50px -30px rgb(0 0 0 / .9);
+    transition: background-color 700ms var(--ease-fluid), border-color 700ms var(--ease-fluid);
   }
-  .skip:focus { left: 0; }
+  .nav.is-stuck { background: rgb(16 16 18 / .8); border-color: var(--shell-ring-2); }
+  @media (prefers-reduced-transparency: reduce) {
+    .nav { background: #0c0c0d; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  }
+  .brand {
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: -.02em;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .nav-links { display: flex; gap: 1.5rem; }
+  .nav-links a {
+    font-size: .95rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 400ms var(--ease-fluid);
+  }
 
-  /* ---------- Enlaces y controles ---------- */
+  /* ---------- Botones: pastilla con el icono dentro de su propio circulo ---------- */
   .btn {
     display: inline-flex;
     align-items: center;
-    gap: .6rem;
-    padding: .82rem 1.35rem;
+    gap: .85rem;
+    padding: .7rem .7rem .7rem 1.5rem;
     border: 1px solid transparent;
-    border-radius: var(--r-pill);
+    border-radius: var(--pill);
     font-size: 1rem;
     font-weight: 600;
     text-decoration: none;
     white-space: nowrap;
-    transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), color 160ms var(--ease-out), transform 160ms var(--ease-out);
+    transition: background-color 500ms var(--ease-fluid), border-color 500ms var(--ease-fluid), color 500ms var(--ease-fluid), transform 500ms var(--ease-fluid);
   }
+  .btn .disc {
+    display: grid;
+    place-items: center;
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+    border-radius: var(--pill);
+    transition: transform 500ms var(--ease-fluid), background-color 500ms var(--ease-fluid);
+  }
+  .btn .icon {
+    inline-size: 1rem;
+    block-size: 1rem;
+    background-color: currentColor;
+  }
+  .btn-primary { background: var(--text); color: #0a0a0b; }
+  .btn-primary .disc { background: rgb(0 0 0 / .08); }
+  .btn-ghost { border-color: var(--shell-ring-2); color: var(--text); }
+  .btn-ghost .disc { background: rgb(255 255 255 / .08); }
   .btn:active { transform: scale(.98); }
-  .btn-primary { background: var(--text); color: #121110; }
-  .btn-ghost { border-color: var(--line-2); color: var(--text); }
-  .arrow { font-size: .95em; }
-
-  a.inline {
-    color: var(--text);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-decoration-color: var(--line-2);
-    text-underline-offset: 4px;
-    transition: text-decoration-color 160ms var(--ease-out), text-decoration-thickness 160ms var(--ease-out);
-  }
-  .go {
-    display: inline-flex;
-    align-items: center;
-    gap: .45rem;
-    font-weight: 600;
-    text-decoration: none;
-    color: var(--text);
-    transition: color 160ms var(--ease-out);
-  }
-  .go .arrow { transition: transform 200ms var(--ease-out); }
 
   @media (hover: hover) and (pointer: fine) {
     .btn-primary:hover { background: #fff; }
     .btn-ghost:hover { border-color: var(--text); }
-    a.inline:hover { text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
-    .go:hover { color: var(--accent); }
-    .go:hover .arrow { transform: translate(2px, -2px); }
+    .btn:hover .disc { transform: translate(3px, -3px) scale(1.05); }
+    .nav-links a:hover { color: var(--text); }
+    .shell:hover { border-color: var(--shell-ring-2); }
   }
 
-  /* ---------- Cabecera ---------- */
-  .head {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: color-mix(in oklab, var(--bg) 88%, transparent);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--line);
-  }
-  @media (prefers-reduced-transparency: reduce) {
-    .head { background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none; }
-  }
-  .head-inner {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    min-block-size: 68px;
-  }
-  .brand {
-    font-weight: 700;
-    letter-spacing: -.02em;
-    text-decoration: none;
-    margin-right: auto;
-  }
-  .head nav { display: flex; gap: 1.7rem; }
-  .head nav a {
-    font-size: .95rem;
+  /* ---------- Etiqueta de seccion ---------- */
+  .eyebrow {
+    display: inline-block;
+    padding: .4rem .8rem .45rem;
+    border: 1px solid var(--shell-ring);
+    border-radius: var(--pill);
+    background: var(--shell-bg);
+    font-size: .6875rem;
+    font-weight: 500;
+    letter-spacing: .18em;
+    text-transform: uppercase;
     color: var(--muted);
-    text-decoration: none;
-    transition: color 160ms var(--ease-out);
+  }
+
+  /* ---------- Doble bisel ---------- */
+  .shell {
+    display: flex;
+    padding: .5rem;
+    border: 1px solid var(--shell-ring);
+    border-radius: var(--shell-r);
+    background: var(--shell-bg);
+    transition: border-color 700ms var(--ease-fluid), transform 700ms var(--ease-fluid);
+  }
+  .core {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border-radius: var(--core-r);
+    background: var(--core);
+    box-shadow: var(--inset);
   }
 
   /* ---------- Portada ---------- */
-  .hero {
-    padding-block: clamp(4.5rem, 11vw, 8.5rem) clamp(4rem, 9vw, 7rem);
-  }
-  h1 {
-    font-size: clamp(2.5rem, 1.2rem + 4.4vw, 4.9rem);
-    line-height: 1.05;
-    letter-spacing: -.03em;
-    font-weight: 600;
-    max-width: 17ch;
-  }
-  .sub {
+  .hero { padding-block: clamp(5rem, 12vw, 9rem) clamp(4rem, 9vw, 7rem); }
+  .hero h1 {
     margin-top: 1.6rem;
-    max-width: 54ch;
-    font-size: clamp(1.05rem, 1rem + .3vw, 1.2rem);
+    font-size: clamp(2.7rem, 1.1rem + 5.6vw, 5.6rem);
+    line-height: .98;
+    letter-spacing: -.035em;
+    font-weight: 600;
+    max-width: 16ch;
+  }
+  .hero .sub {
+    margin-top: 1.7rem;
+    max-width: 52ch;
+    font-size: clamp(1.05rem, 1rem + .35vw, 1.2rem);
     color: var(--muted);
   }
-  .hero-actions {
-    display: flex;
-    flex-wrap: wrap;
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 2.6rem; }
+
+  /* Indice de la portada: contenido real, no relleno. */
+  .index-title {
+    font-size: .6875rem;
+    font-weight: 500;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: .9rem;
+  }
+  .index-rows li + li { border-top: 1px solid var(--shell-ring); }
+  .index-rows a {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: .9rem;
     align-items: center;
-    gap: 1rem;
-    margin-top: 2.4rem;
+    padding: .85rem .6rem .85rem .75rem;
+    border-radius: 1rem;
+    text-decoration: none;
+    transition: background-color 500ms var(--ease-fluid);
+  }
+  .index-rows .name { font-weight: 600; }
+  .index-rows .meta { font-size: .82rem; color: var(--muted); }
+  .index-rows .disc {
+    display: grid;
+    place-items: center;
+    inline-size: 1.9rem;
+    block-size: 1.9rem;
+    border-radius: var(--pill);
+    background: rgb(255 255 255 / .07);
+    transition: transform 500ms var(--ease-fluid);
+  }
+  .index-rows .icon { inline-size: .85rem; block-size: .85rem; background-color: currentColor; }
+  @media (hover: hover) and (pointer: fine) {
+    .index-rows a:hover { background: rgb(255 255 255 / .04); }
+    .index-rows a:hover .disc { transform: translate(2px, -2px); }
   }
 
   /* ---------- Secciones ---------- */
-  .section { padding-block: clamp(3.5rem, 8vw, 6rem); }
-  .section-head {
-    display: grid;
-    gap: .85rem;
-    margin-bottom: clamp(2rem, 4vw, 3rem);
-  }
+  .section { padding-block: clamp(4rem, 9vw, 7rem); }
+  .section-head { display: grid; gap: 1.1rem; justify-items: start; margin-bottom: clamp(2.25rem, 5vw, 3.5rem); }
   h2 {
-    font-size: clamp(1.7rem, 1.3rem + 1.5vw, 2.5rem);
-    line-height: 1.08;
-    letter-spacing: -.028em;
+    font-size: clamp(1.9rem, 1.3rem + 2.2vw, 3rem);
+    line-height: 1.04;
+    letter-spacing: -.03em;
     font-weight: 600;
-    text-wrap: balance;
+    max-width: 22ch;
   }
-  .section-head p { color: var(--muted); max-width: 62ch; }
+  .section-head p { color: var(--muted); max-width: 58ch; }
 
-  /* ---------- Proyectos ---------- */
-  .project {
-    display: grid;
-    gap: 1.6rem 3rem;
-    padding: clamp(1.6rem, 3.5vw, 2.4rem);
-    border: 1px solid var(--line);
-    border-radius: var(--r-panel);
-    background: var(--surface);
-    transition: border-color 200ms var(--ease-out), transform 200ms var(--ease-out);
-  }
-  .project + .project { margin-top: 1.25rem; }
-  .project-main > h3 {
-    font-size: clamp(1.5rem, 1.2rem + 1.1vw, 2rem);
-    line-height: 1.06;
-    letter-spacing: -.025em;
-    font-weight: 600;
-  }
-  .project-main > p { margin-top: .8rem; color: var(--muted); max-width: 52ch; }
-  .tags { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: 1.3rem; }
+  /* ---------- Bento asimetrico ---------- */
+  .bento { display: grid; gap: 1.1rem; }
+  .bento > * { min-width: 0; }
+
+  h3 { font-size: clamp(1.4rem, 1.15rem + 1vw, 1.85rem); line-height: 1.06; letter-spacing: -.028em; font-weight: 600; }
+  .core p { margin-top: .9rem; color: var(--muted); max-width: 46ch; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: 1.4rem; }
   .tags li {
+    padding: .5rem .85rem;
+    border: 1px solid var(--shell-ring);
+    border-radius: var(--pill);
+    background: var(--shell-bg);
     font-size: .8rem;
-    letter-spacing: .01em;
     color: var(--muted);
-    border: 1px solid var(--line);
-    border-radius: var(--r-pill);
-    padding: .5rem .85rem .5rem;
   }
-  .project-foot { margin-top: 1.5rem; }
 
-  .proof { display: grid; gap: 1rem; align-content: start; }
+  .proof { display: grid; gap: .85rem; margin-top: 1.7rem; }
   .proof li {
     display: grid;
-    grid-template-columns: 1.1rem 1fr;
+    grid-template-columns: 1.2rem 1fr;
     gap: .7rem;
     align-items: start;
     font-size: .95rem;
     color: var(--muted);
   }
-  .proof .tick { color: var(--accent); line-height: 1.5; }
+  .proof .tick { color: var(--accent); }
   .proof strong { color: var(--text); font-weight: 600; }
 
   .snippet {
-    margin-top: 1.4rem;
-    padding: .95rem 1.1rem;
-    border-radius: 12px;
-    background: var(--surface-2);
-    font-family: 'Spline Sans Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+    margin-top: 1.5rem;
+    padding: 1rem 1.15rem;
+    border-radius: 1rem;
+    background: var(--core-2);
+    box-shadow: var(--inset);
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
     font-size: .82rem;
-    line-height: 1.7;
+    line-height: 1.75;
     color: var(--muted);
     overflow-x: auto;
   }
   .snippet b { color: var(--text); font-weight: 500; }
   .snippet em { color: var(--accent); font-style: normal; }
 
-  /* ---------- Servicios: un indice con reglas, no seis cajas ---------- */
-  .services { display: grid; gap: 1.9rem 2.5rem; }
-  .service { border-top: 1px solid var(--line); padding-top: 1.1rem; }
-  .service h3 { font-size: 1.08rem; font-weight: 600; letter-spacing: -.01em; }
-  .service p { margin-top: .5rem; font-size: .95rem; color: var(--muted); }
+  .card-foot { margin-top: auto; padding-top: 1.8rem; }
+  .go {
+    display: inline-flex;
+    align-items: center;
+    gap: .8rem;
+    padding: .55rem 1.3rem .55rem .55rem;
+    border: 1px solid var(--shell-ring);
+    border-radius: var(--pill);
+    background: var(--shell-bg);
+    font-weight: 600;
+    text-decoration: none;
+    transition: border-color 500ms var(--ease-fluid), transform 500ms var(--ease-fluid);
+  }
+  .go .disc {
+    display: grid;
+    place-items: center;
+    inline-size: 1.9rem;
+    block-size: 1.9rem;
+    border-radius: var(--pill);
+    background: rgb(255 255 255 / .08);
+    transition: transform 500ms var(--ease-fluid);
+  }
+  .go .icon {
+    inline-size: .9rem;
+    block-size: .9rem;
+    background-color: currentColor;
+  }
+  .go:active { transform: scale(.98); }
+  @media (hover: hover) and (pointer: fine) {
+    .go:hover { border-color: var(--shell-ring-2); }
+    .go:hover .disc { transform: translate(2px, -2px); }
+  }
 
-  /* ---------- Otros encargos ---------- */
+  .icon-ext {
+    -webkit-mask: url('https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/arrow-up-right.svg') center / contain no-repeat;
+    mask: url('https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/arrow-up-right.svg') center / contain no-repeat;
+  }
+
+  /* ---------- Servicios ---------- */
+  .service h3 { font-size: 1.06rem; letter-spacing: -.01em; }
+  .service p { margin-top: .55rem; font-size: .95rem; color: var(--muted); }
+  .service .core { padding: clamp(1.25rem, 2.4vw, 1.75rem); }
+
+  /* ---------- Encargos ---------- */
   .others li {
     display: grid;
     gap: .35rem 2rem;
     align-items: baseline;
-    padding-block: 1.2rem;
-    border-top: 1px solid var(--line);
+    padding-block: 1.25rem;
+    border-top: 1px solid var(--shell-ring);
   }
-  .others h3 { font-size: 1.05rem; font-weight: 600; }
-  .others p { font-size: .95rem; color: var(--muted); }
+  .others li:first-child { border-top: 0; padding-top: 0; }
+  .others h3 { font-size: 1.05rem; }
+  .others p { font-size: .95rem; color: var(--muted); margin: 0; }
   .tag-private {
     justify-self: start;
-    font-size: .74rem;
-    letter-spacing: .04em;
+    padding: .45rem .75rem;
+    border: 1px solid var(--shell-ring);
+    border-radius: var(--pill);
+    background: var(--shell-bg);
+    font-size: .72rem;
+    letter-spacing: .06em;
     text-transform: uppercase;
     color: var(--muted);
-    border: 1px solid var(--line);
-    border-radius: var(--r-pill);
-    padding: .45rem .75rem .45rem;
   }
 
   /* ---------- Contacto ---------- */
-  .contact {
-    padding-block: clamp(4.5rem, 10vw, 8rem);
-    text-align: center;
-    border-top: 1px solid var(--line);
-  }
-  .contact h2 { max-width: 20ch; margin-inline: auto; }
-  .contact p { margin: 1.3rem auto 0; max-width: 56ch; color: var(--muted); }
-  .contact .hero-actions { justify-content: center; }
+  .contact { padding-block: clamp(4rem, 9vw, 7rem); }
+  .contact .core { padding: clamp(2.25rem, 6vw, 4.5rem); text-align: center; }
+  .contact h2 { margin-inline: auto; }
+  .contact p { margin: 1.4rem auto 0; max-width: 54ch; }
+  .contact .actions { justify-content: center; }
 
-  .foot { border-top: 1px solid var(--line); padding-block: 1.8rem 2.6rem; }
+  /* ---------- Pie ---------- */
+  .foot { padding-block: 2rem 3rem; }
   .foot-inner {
     display: flex;
     flex-wrap: wrap;
-    gap: .6rem 1.8rem;
+    gap: .7rem 2rem;
     align-items: baseline;
     font-size: .88rem;
     color: var(--muted);
   }
-  .foot-inner a { text-decoration: none; }
+  .foot-inner a { text-decoration: none; transition: color 400ms var(--ease-fluid); }
   @media (hover: hover) and (pointer: fine) {
     .foot-inner a:hover { color: var(--accent); }
-    .head nav a:hover { color: var(--text); }
-    .project:hover { border-color: var(--line-2); transform: translateY(-2px); }
   }
 
-  /* ---------- Un solo momento: la portada se descubre al cargar ---------- */
-  .mask {
+  /* ---------- Menu movil: pastilla de cristal a pantalla completa ---------- */
+  .burger {
+    display: none;
+    position: relative;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    padding: 0;
+    border: 1px solid var(--shell-ring);
+    border-radius: var(--pill);
+    background: rgb(255 255 255 / .06);
+    cursor: pointer;
+  }
+  .burger span {
+    position: absolute;
+    left: 50%;
+    inline-size: 1rem;
+    block-size: 1.5px;
+    margin-left: -.5rem;
+    border-radius: var(--pill);
+    background: var(--text);
+    transition: transform 700ms var(--ease-fluid);
+  }
+  .burger span:nth-child(1) { top: 1.05rem; }
+  .burger span:nth-child(2) { top: 1.4rem; }
+  .burger[aria-expanded='true'] span:nth-child(1) { transform: translateY(.175rem) rotate(45deg); }
+  .burger[aria-expanded='true'] span:nth-child(2) { transform: translateY(-.175rem) rotate(-45deg); }
+
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-menu);
+    display: grid;
+    place-items: center;
+    background: rgb(5 5 5 / .86);
+    -webkit-backdrop-filter: blur(28px);
+    backdrop-filter: blur(28px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 700ms var(--ease-fluid), visibility 0s linear 700ms;
+  }
+  .menu.is-open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 700ms var(--ease-fluid), visibility 0s;
+  }
+  .menu ul { display: grid; gap: .5rem; text-align: center; }
+  .menu a {
     display: block;
-    overflow: hidden;
-    padding-bottom: .14em;
-    margin-bottom: -.14em;
+    padding: .6rem 1.2rem;
+    font-size: clamp(1.9rem, 8vw, 2.6rem);
+    font-weight: 600;
+    letter-spacing: -.03em;
+    text-decoration: none;
+    opacity: 0;
+    transform: translateY(2rem);
+    transition: opacity 700ms var(--ease-fluid), transform 700ms var(--ease-fluid);
   }
-  .rise { display: block; }
-  .js .rise {
-    transform: translateY(105%);
-    transition: transform 780ms var(--ease-in-out);
-    transition-delay: var(--i, 0ms);
-  }
-  .js.is-ready .rise { transform: none; }
+  .menu.is-open a { opacity: 1; transform: none; }
+  .menu.is-open a:nth-child(1) { transition-delay: 100ms; }
+  .menu.is-open a:nth-child(2) { transition-delay: 160ms; }
+  .menu.is-open a:nth-child(3) { transition-delay: 220ms; }
 
-  .js .fade { opacity: 0; transform: translateY(10px); }
-  .js.is-ready .fade {
+  /* ---------- Entrada al hacer scroll: nada aparece quieto ---------- */
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(3rem);
+    filter: blur(8px);
+  }
+  .js .reveal.is-in {
     opacity: 1;
     transform: none;
-    transition: opacity 520ms var(--ease-out), transform 520ms var(--ease-out);
-    transition-delay: var(--i, 0ms);
+    filter: blur(0);
+    transition: opacity 900ms var(--ease-fluid), transform 900ms var(--ease-fluid), filter 900ms var(--ease-fluid);
+    transition-delay: var(--d, 0ms);
   }
   @media (prefers-reduced-motion: reduce) {
-    .js .rise, .js .fade { transform: none; opacity: 1; transition: none; }
+    .js .reveal { opacity: 1; transform: none; filter: none; transition: none; }
+    .menu a { opacity: 1; transform: none; }
     html { scroll-behavior: auto; }
-    .btn:active { transform: none; }
+    .btn:active, .go:active { transform: none; }
   }
 
   /* ---------- Composicion ---------- */
-  @media (min-width: 860px) {
-    .project { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
-    .services { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (min-width: 1024px) {
+    .hero { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: clamp(2.5rem, 5vw, 4.5rem); align-items: center; }
+    .hero-index .core { padding: 1.25rem 1.25rem 1.25rem 1rem; }
+  }
+  @media (min-width: 768px) {
+    .bento { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+    .cell-7 { grid-column: span 7; }
+    .cell-5 { grid-column: span 5; }
+    .cell-4 { grid-column: span 4; }
+    .cell-6 { grid-column: span 6; }
+    .cell-3 { grid-column: span 3; }
+    .cell-8 { grid-column: span 8; }
+    .cell-12 { grid-column: span 12; }
+    .wide-cell .core { display: grid; gap: 1.25rem 3rem; grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); align-items: start; }
     .others li { grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) auto; }
   }
-  @media (min-width: 620px) {
-    .foot-inner .right { margin-left: auto; }
-  }
-  @media (max-width: 859px) {
+  @media (max-width: 767px) {
+    :root { --shell-r: 1.5rem; }
+    .nav-links { display: none; }
+    .burger { display: block; }
+    .nav { padding-right: .5rem; }
     .others li { grid-template-columns: minmax(0, 1fr); }
-  }
-  @media (max-width: 560px) {
-    .head nav { display: none; }
   }
 </style>
 </head>
 <body>
-<a class="skip" href="#trabajo">Saltar al contenido</a>
 
-<header class="head">
-  <div class="wrap head-inner">
-    <a class="brand" href="#top">SeoMavares</a>
-    <nav aria-label="Secciones">
-      <a href="#trabajo">Trabajo</a>
-      <a href="#servicios">Servicios</a>
-      <a href="#contacto">Contacto</a>
+<div class="glow" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="page">
+  <div class="nav-slot">
+    <nav class="nav" aria-label="Principal">
+      <a class="brand" href="#top">SeoMavares</a>
+      <div class="nav-links">
+        <a href="#trabajo">Trabajo</a>
+        <a href="#servicios">Servicios</a>
+        <a href="#contacto">Contacto</a>
+      </div>
+      <button class="burger" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu">
+        <span></span><span></span>
+      </button>
     </nav>
   </div>
-</header>
 
-<main id="top">
+  <main id="top">
 
-  <section class="hero wrap">
-    <h1>
-      <span class="mask"><span class="rise" style="--i:0ms">Software a medida</span></span>
-      <span class="mask"><span class="rise" style="--i:90ms">para tu negocio</span></span>
-    </h1>
-    <p class="sub fade" style="--i:340ms">Diseño, construyo y publico apps Android, backends y paneles web. Una sola persona de principio a fin: hablas siempre con quien escribe el código.</p>
-    <div class="hero-actions fade" style="--i:440ms">
-      <a class="btn btn-primary" href="https://forobeta.com/direct-messages/add?to=seomavares" target="_blank" rel="noopener noreferrer">Enviarme un mensaje <span class="arrow" aria-hidden="true">↗</span></a>
-      <a class="btn btn-ghost" href="#trabajo">Ver el trabajo</a>
+    <section class="hero wrap">
+      <div class="hero-copy">
+        <span class="eyebrow reveal" style="--d:0ms">Android, backend y web</span>
+        <h1 class="reveal" style="--d:80ms">Software a medida para tu negocio</h1>
+        <p class="sub reveal" style="--d:180ms">Diseño, construyo y publico apps Android, backends y paneles web. Sin intermediarios: hablas siempre con quien escribe el código.</p>
+        <div class="actions reveal" style="--d:260ms">
+          <a class="btn btn-primary" href="https://forobeta.com/direct-messages/add?to=seomavares" target="_blank" rel="noopener noreferrer">Enviarme un mensaje <span class="disc"><span class="icon icon-ext" aria-hidden="true"></span></span></a>
+          <a class="btn btn-ghost" href="#trabajo">Ver el trabajo <span class="disc"><span class="icon icon-ext" aria-hidden="true"></span></span></a>
+        </div>
+      </div>
+
+      <aside class="shell hero-index reveal" style="--d:340ms" aria-label="Trabajo destacado">
+        <div class="core">
+          <p class="index-title">Trabajo destacado</p>
+          <ul class="index-rows">
+            <li>
+              <a href="#trabajo">
+                <span class="name">LinguaLens</span>
+                <span class="meta">Android</span>
+                <span class="disc"><span class="icon icon-ext" aria-hidden="true"></span></span>
+              </a>
+            </li>
+            <li>
+              <a href="#trabajo">
+                <span class="name">miwayomi</span>
+                <span class="meta">Escritorio</span>
+                <span class="disc"><span class="icon icon-ext" aria-hidden="true"></span></span>
+              </a>
+            </li>
+            <li>
+              <a href="#encargos">
+                <span class="name">Encargos de cliente</span>
+                <span class="meta">Privado</span>
+                <span class="disc"><span class="icon icon-ext" aria-hidden="true"></span></span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </aside>
+    </section>
+
+    <section id="trabajo" class="section wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Proyectos publicados</span>
+        <h2>Trabajo</h2>
+        <p>Código abierto y en uso real, además de los encargos que hago para clientes.</p>
+      </div>
+
+      <div class="bento">
+        <article class="shell cell-7 reveal" style="--d:0ms">
+          <div class="core">
+            <div>
+              <h3>LinguaLens</h3>
+              <p>Traductor para Android que funciona como app y también como pantalla de inicio del teléfono. Traduce sin conexión y sin clave de API, porque lleva un diccionario dentro.</p>
+              <ul class="tags">
+                <li>Kotlin</li>
+                <li>Jetpack Compose</li>
+                <li>ML Kit</li>
+                <li>Room</li>
+              </ul>
+              <div class="snippet">Con conexión <b>DeepSeek → Gemini → ML Kit → diccionario</b><br>Sin conexión <em>ML Kit → diccionario</em></div>
+              <ul class="proof">
+                <li><span class="tick" aria-hidden="true">✓</span><span><strong>Sin conexión</strong> en los idiomas que tienen paquete instalado, sin clave de API ni servicios externos.</span></li>
+                <li><span class="tick" aria-hidden="true">✓</span><span><strong>Cámara, voz y documentos</strong> con OCR propio y salida en PDF, Word o texto.</span></li>
+                <li><span class="tick" aria-hidden="true">✓</span><span><strong>Launcher propio</strong> que sustituye la pantalla de inicio, con panel lateral y notificación fija.</span></li>
+                <li><span class="tick" aria-hidden="true">✓</span><span><strong>Panel de control</strong> en Node.js para cambiar claves y modos sin recompilar el APK.</span></li>
+              </ul>
+            </div>
+            <p class="card-foot"><a class="go" href="https://github.com/SeoMavares/lingua-lens-app" target="_blank" rel="noopener noreferrer">Ver el repositorio <span class="disc"><span class="icon icon-ext" aria-hidden="true"></span></span></a></p>
+          </div>
+        </article>
+
+        <article class="shell cell-5 reveal" style="--d:80ms">
+          <div class="core">
+            <h3>miwayomi</h3>
+            <p>Servidor que ejecuta en el ordenador las extensiones de Android de Tachiyomi y Aniyomi, sin emulador y sin teléfono, y las publica como API y como interfaz web.</p>
+            <ul class="tags">
+              <li>Kotlin</li>
+              <li>Ktor</li>
+              <li>JVM</li>
+              <li>Docker</li>
+            </ul>
+            <div class="snippet"><b>docker compose up -d</b><br>listo en el navegador</div>
+            <ul class="proof">
+              <li><span class="tick" aria-hidden="true">✓</span><span><strong>Lo usan otras personas</strong>: hay forks y peticiones abiertas desde fuera de mi cuenta.</span></li>
+              <li><span class="tick" aria-hidden="true">✓</span><span><strong>Carga extensiones</strong> convirtiendo el APK y reparando el bytecode.</span></li>
+              <li><span class="tick" aria-hidden="true">✓</span><span><strong>Vídeo HLS y DASH</strong> con los manifiestos reescritos.</span></li>
+            </ul>
+            <p class="card-foot"><a class="go" href="https://github.com/SeoMavares/miwayomi" target="_blank" rel="noopener noreferrer">Ver el repositorio <span class="disc"><span class="icon icon-ext" aria-hidden="true"></span></span></a></p>
+          </div>
+        </article>
+
+        <article class="shell cell-12 wide-cell reveal" style="--d:160ms">
+          <div class="core">
+            <h3>El código está abierto</h3>
+            <div>
+              <p style="margin-top:0">Puedes leer cómo está hecho antes de escribirme. Los repositorios llevan su documentación técnica, con las decisiones y los motivos.</p>
+              <ul class="tags">
+                <li>Licencia Apache</li>
+                <li>Documentación técnica</li>
+                <li>Integración continua</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="servicios" class="section wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Lo que hago</span>
+        <h2>Servicios</h2>
+        <p>Coger una idea y devolver algo publicado, sin repartir el trabajo entre varios proveedores.</p>
+      </div>
+
+      <div class="bento">
+        <div class="shell cell-4 service reveal" style="--d:0ms">
+          <div class="core">
+            <h3>Apps Android</h3>
+            <p>Aplicaciones nativas en Kotlin con Jetpack Compose, listas para publicar en Play.</p>
+          </div>
+        </div>
+        <div class="shell cell-4 service reveal" style="--d:80ms">
+          <div class="core">
+            <h3>Backends y APIs</h3>
+            <p>Servicios en Kotlin y Ktor o en Node.js, con base de datos, autenticación y API documentada.</p>
+          </div>
+        </div>
+        <div class="shell cell-4 service reveal" style="--d:160ms">
+          <div class="core">
+            <h3>Paneles de gestión</h3>
+            <p>Herramientas web para que tu equipo administre datos, contenidos o clientes sin depender de nadie.</p>
+          </div>
+        </div>
+        <div class="shell cell-6 service reveal" style="--d:0ms">
+          <div class="core">
+            <h3>Inteligencia artificial</h3>
+            <p>Funciones de IA conectadas a tu negocio, con proveedor intercambiable y alternativa cuando no hay red.</p>
+          </div>
+        </div>
+        <div class="shell cell-3 service reveal" style="--d:80ms">
+          <div class="core">
+            <h3>Vídeo y datos</h3>
+            <p>Reproducción en streaming y procesado de documentos por lotes.</p>
+          </div>
+        </div>
+        <div class="shell cell-3 service reveal" style="--d:160ms">
+          <div class="core">
+            <h3>Publicación</h3>
+            <p>Compilación, contenedores y despliegue automático, con el código en tu poder.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="encargos" class="section wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Encargos</span>
+        <h2>Clientes</h2>
+        <p>Proyectos entregados cuyo código pertenece al cliente y no se publica. Van descritos por tipo de trabajo.</p>
+      </div>
+
+      <div class="shell cell-12 reveal">
+        <div class="core">
+          <ul class="others">
+            <li>
+              <h3>Gestión de comunidades</h3>
+              <p>Panel de administración y web pública para el día a día de una comunidad de vecinos.</p>
+              <span class="tag-private">Privado</span>
+            </li>
+            <li>
+              <h3>Suite de televisión por internet</h3>
+              <p>Aplicación web y aplicación Android sobre la misma fuente de canales y listas.</p>
+              <span class="tag-private">Privado</span>
+            </li>
+            <li>
+              <h3>Paneles con datos en vivo</h3>
+              <p>Administración de contenidos y resultados deportivos que se actualizan solos.</p>
+              <span class="tag-private">Privado</span>
+            </li>
+            <li>
+              <h3>Webs institucionales</h3>
+              <p>Web de centro educativo y páginas de evento, sin dependencias y con carga inmediata.</p>
+              <span class="tag-private">Privado</span>
+            </li>
+            <li>
+              <h3>Herramientas internas</h3>
+              <p>Utilidades en Go para tareas repetitivas y procesado de archivos por lotes.</p>
+              <span class="tag-private">Privado</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="contacto" class="section contact wrap">
+      <div class="shell reveal">
+        <div class="core">
+          <span class="eyebrow">Hablemos</span>
+          <h2 style="margin-top:1.4rem">Cuéntame qué tienes que construir</h2>
+          <p>Escríbeme por mensaje directo en ForoBeta y te contesto con un alcance y un precio concretos. Si prefieres ver antes cómo trabajo, el código de mis proyectos está en GitHub.</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="https://forobeta.com/direct-messages/add?to=seomavares" target="_blank" rel="noopener noreferrer">Enviarme un mensaje <span class="disc"><span class="icon icon-ext" aria-hidden="true"></span></span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot wrap">
+    <div class="foot-inner">
+      <span>© SeoMavares</span>
+      <a href="https://github.com/SeoMavares/lingua-lens-app" target="_blank" rel="noopener noreferrer">LinguaLens</a>
+      <a href="https://github.com/SeoMavares/miwayomi" target="_blank" rel="noopener noreferrer">miwayomi</a>
+      <a href="https://forobeta.com/direct-messages/add?to=seomavares" target="_blank" rel="noopener noreferrer">Mensaje directo</a>
+      <span style="margin-left:auto">Apps Android, backends y web</span>
     </div>
-  </section>
+  </footer>
+</div>
 
-  <section id="trabajo" class="section wrap">
-    <div class="section-head">
-      <h2>Trabajo</h2>
-      <p>Dos proyectos con el código abierto y en uso real, además de los encargos que hago para clientes.</p>
-    </div>
-
-    <article class="project">
-      <div class="project-main">
-        <h3>LinguaLens</h3>
-        <p>Traductor para Android que funciona como app y también como pantalla de inicio del teléfono. Traduce 160 idiomas, 60 de ellos sin conexión, y siempre responde: si ninguna IA está disponible, cae al diccionario que lleva dentro.</p>
-        <ul class="tags">
-          <li>Kotlin</li>
-          <li>Jetpack Compose</li>
-          <li>ML Kit</li>
-          <li>Room</li>
-        </ul>
-        <p class="project-foot"><a class="go" href="https://github.com/SeoMavares/lingua-lens-app">Ver el repositorio <span class="arrow" aria-hidden="true">↗</span></a></p>
-      </div>
-      <ul class="proof">
-        <li><span class="tick" aria-hidden="true">✓</span><span><strong>160 idiomas</strong>, 60 de ellos sin conexión y sin clave de API.</span></li>
-        <li><span class="tick" aria-hidden="true">✓</span><span><strong>Cámara, voz y documentos</strong> con OCR propio y salida en PDF, Word o texto.</span></li>
-        <li><span class="tick" aria-hidden="true">✓</span><span><strong>Launcher propio</strong> que sustituye la pantalla de inicio, con panel lateral y notificación fija.</span></li>
-        <li><span class="tick" aria-hidden="true">✓</span><span><strong>Panel de control</strong> en Node.js para cambiar claves y modos sin recompilar el APK.</span></li>
-      </ul>
-    </article>
-
-    <article class="project">
-      <div class="project-main">
-        <h3>miwayomi</h3>
-        <p>Servidor que ejecuta en el ordenador las extensiones de Android de Tachiyomi y Aniyomi, sin emulador y sin teléfono, y las publica como API y como interfaz web. Convertir y reparar bytecode de Android para que corra sobre la JVM es la parte difícil, y funciona.</p>
-        <ul class="tags">
-          <li>Kotlin</li>
-          <li>Ktor</li>
-          <li>JVM 21</li>
-          <li>Docker</li>
-        </ul>
-        <div class="snippet"><b>docker compose up -d</b><br>listo en <em>http://localhost:4567</em></div>
-        <p class="project-foot"><a class="go" href="https://github.com/SeoMavares/miwayomi">Ver el repositorio <span class="arrow" aria-hidden="true">↗</span></a></p>
-      </div>
-      <ul class="proof">
-        <li><span class="tick" aria-hidden="true">✓</span><span><strong>29 estrellas y 2 forks</strong>, con peticiones de gente de fuera de la cuenta.</span></li>
-        <li><span class="tick" aria-hidden="true">✓</span><span><strong>Carga extensiones</strong> convirtiendo el APK y reparando el bytecode al primer arranque.</span></li>
-        <li><span class="tick" aria-hidden="true">✓</span><span><strong>Vídeo HLS y DASH</strong> con los manifiestos reescritos y envío por trozos.</span></li>
-        <li><span class="tick" aria-hidden="true">✓</span><span><strong>Docker e integración continua</strong> con imágenes multiarquitectura publicadas solas en cada versión.</span></li>
-      </ul>
-    </article>
-  </section>
-
-  <section id="servicios" class="section wrap">
-    <div class="section-head">
-      <h2>Servicios</h2>
-      <p>Coger una idea y devolver algo publicado. Sin repartir el trabajo entre varios proveedores.</p>
-    </div>
-
-    <div class="services">
-      <div class="service">
-        <h3>Apps Android</h3>
-        <p>Aplicaciones nativas en Kotlin con Jetpack Compose, listas para publicar en Play.</p>
-      </div>
-      <div class="service">
-        <h3>Backends y APIs</h3>
-        <p>Servicios en Kotlin y Ktor o en Node.js, con base de datos, autenticación y API documentada.</p>
-      </div>
-      <div class="service">
-        <h3>Paneles de gestión</h3>
-        <p>Herramientas web para que tu equipo administre datos, contenidos o clientes sin depender de nadie.</p>
-      </div>
-      <div class="service">
-        <h3>Inteligencia artificial</h3>
-        <p>Funciones de IA conectadas a tu negocio, con proveedor intercambiable y alternativa cuando no hay red.</p>
-      </div>
-      <div class="service">
-        <h3>Vídeo y datos</h3>
-        <p>Reproducción en streaming, lectura de fuentes externas y procesado de documentos por lotes.</p>
-      </div>
-      <div class="service">
-        <h3>Publicación y entrega</h3>
-        <p>Compilación, contenedores y despliegue automático, con el código en tu poder.</p>
-      </div>
-    </div>
-  </section>
-
-  <section id="encargos" class="section wrap">
-    <div class="section-head">
-      <h2>Encargos de cliente</h2>
-      <p>Proyectos entregados cuyo código pertenece al cliente y no se publica. Van descritos por tipo de trabajo.</p>
-    </div>
-
-    <ul class="others">
-      <li>
-        <h3>Gestión de comunidades</h3>
-        <p>Panel de administración y web pública para el día a día de una comunidad de vecinos.</p>
-        <span class="tag-private">Privado</span>
-      </li>
-      <li>
-        <h3>Suite de televisión por internet</h3>
-        <p>Aplicación web y aplicación Android sobre la misma fuente de canales y listas.</p>
-        <span class="tag-private">Privado</span>
-      </li>
-      <li>
-        <h3>Paneles con datos en vivo</h3>
-        <p>Administración de contenidos y resultados deportivos que se actualizan solos.</p>
-        <span class="tag-private">Privado</span>
-      </li>
-      <li>
-        <h3>Webs institucionales</h3>
-        <p>Web de centro educativo y páginas de evento, sin dependencias y con carga inmediata.</p>
-        <span class="tag-private">Privado</span>
-      </li>
-      <li>
-        <h3>Herramientas internas</h3>
-        <p>Utilidades en Go para tareas repetitivas y procesado de archivos por lotes.</p>
-        <span class="tag-private">Privado</span>
-      </li>
-    </ul>
-  </section>
-
-  <section id="contacto" class="contact wrap">
-    <h2>Cuéntame qué tienes que construir</h2>
-    <p>Escríbeme por mensaje directo en ForoBeta y te contesto con un alcance y un precio concretos. Si prefieres ver antes cómo trabajo, el código de mis proyectos está en GitHub.</p>
-    <div class="hero-actions">
-      <a class="btn btn-primary" href="https://forobeta.com/direct-messages/add?to=seomavares" target="_blank" rel="noopener noreferrer">Enviarme un mensaje <span class="arrow" aria-hidden="true">↗</span></a>
-    </div>
-  </section>
-</main>
-
-<footer class="foot">
-  <div class="wrap foot-inner">
-    <span>© 2026 SeoMavares</span>
-    <a href="https://github.com/SeoMavares/lingua-lens-app">LinguaLens</a>
-    <a href="https://github.com/SeoMavares/miwayomi">miwayomi</a>
-    <a href="https://forobeta.com/direct-messages/add?to=seomavares" target="_blank" rel="noopener noreferrer">Mensaje directo</a>
-    <span class="right">Apps Android, backends y web</span>
-  </div>
-</footer>
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Menú">
+  <ul>
+    <li><a href="#trabajo">Trabajo</a></li>
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+</div>
 
 <script>
-  requestAnimationFrame(function () {
-    document.documentElement.classList.add('is-ready');
+  const root = document.documentElement;
+
+  /* Entrada al hacer scroll: cada bloque entra con su propio retardo. */
+  const revealables = document.querySelectorAll('.reveal');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduceMotion || !('IntersectionObserver' in window)) {
+    revealables.forEach(function (el) { el.classList.add('is-in'); });
+  } else {
+    const revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-in');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.12 });
+    revealables.forEach(function (el) { revealObserver.observe(el); });
+  }
+
+  /* La isla de navegacion se asienta al salir de la portada. */
+  const nav = document.querySelector('.nav');
+  const sentinel = document.createElement('div');
+  sentinel.setAttribute('aria-hidden', 'true');
+  document.body.insertBefore(sentinel, document.body.firstChild);
+  new IntersectionObserver(function (entries) {
+    nav.classList.toggle('is-stuck', !entries[0].isIntersecting);
+  }, { threshold: 0 }).observe(sentinel);
+
+  /* Menu movil: apertura a pantalla completa con enlaces escalonados. */
+  const burger = document.querySelector('.burger');
+  const menu = document.getElementById('menu');
+  const menuLinks = menu.querySelectorAll('a');
+
+  function setMenu(open) {
+    burger.setAttribute('aria-expanded', String(open));
+    burger.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+    menu.classList.toggle('is-open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+    if (open) {
+      /* El foco necesita dos fotogramas: la capa aun era invisible en este paso. */
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { menuLinks[0].focus(); });
+      });
+    } else {
+      burger.focus();
+    }
+  }
+
+  burger.addEventListener('click', function () {
+    setMenu(burger.getAttribute('aria-expanded') !== 'true');
+  });
+  menuLinks.forEach(function (link) {
+    link.addEventListener('click', function () { setMenu(false); });
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && menu.classList.contains('is-open')) { setMenu(false); }
   });
 </script>
 </body>
