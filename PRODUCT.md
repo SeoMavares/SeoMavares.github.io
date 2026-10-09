@@ -55,8 +55,10 @@ Constraints:
 
 - The site is a single `index.html`: no build step, no framework, no bundler.
 - Dark only. The user asked for a black background for this surface.
-- GitHub is the only contact channel. No email, phone or social account was
-  supplied, so none may appear.
+- Contact channel is ForoBeta direct messages
+  (`https://forobeta.com/direct-messages/add?to=seomavares`). No email, phone
+  or other social account was supplied, so none may appear. GitHub is a place to
+  read the code, never the way to get in touch.
 - There are no product screenshots, client logos or testimonials in evidence.
   Mock product UI and invented proof are prohibited.
 
@@ -101,7 +103,7 @@ pricing, delivery timelines, team size beyond one developer.
 3. Speak to the decision the client is making, not to the developer's résumé.
 4. Never invent proof: no fake screenshots, no fake numbers, no fake logos, no
    invented clients.
-5. One clear next step: GitHub, stated once.
+5. One clear next step: the ForoBeta message, stated once.
 
 ## Accessibility & Inclusion
 
