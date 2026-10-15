@@ -7,6 +7,7 @@ Sitio: <https://seomavares.github.io>
 ## Contenido del repositorio
 
 - `index.html`: la página completa. HTML, CSS y JavaScript en un solo archivo, sin paso de compilación.
+- `assets/`: las capturas reales de las aplicaciones, optimizadas para la web (WebP, 720 px de ancho).
 - `PRODUCT.md`: qué es el sitio, para quién es y qué pruebas existen. Contexto para cualquier cambio futuro.
 - `.nojekyll`: desactiva el procesado de Jekyll para que los archivos se publiquen tal cual.
 
@@ -16,8 +17,10 @@ Abre `index.html` en cualquier navegador. Los cambios se publican al hacer push 
 
 ## Cómo añadir un proyecto
 
-Copia un bloque `<article class="project">` y cambia el título, el párrafo, las etiquetas y el enlace al repositorio. La lista de la derecha son los cuatro datos que un cliente quiere comprobar de un vistazo.
+Copia un bloque `<article class="shell cell-12 reveal">` y cambia el título, el párrafo, las etiquetas y el enlace al repositorio. Las rejillas disponibles son `cell-4`, `cell-5`, `cell-6`, `cell-7`, `cell-8` y `cell-12`, y el ancho total son doce columnas. El `style="--d:0ms"` de cada tarjeta escalona su aparición al cargar.
+
+Las capturas van en `assets/<proyecto>/`, en WebP de 720 px de ancho, y se colocan dentro de un `<div class="shots">`. Caja es el único proyecto con capturas reales; ninguna imagen inventada puede entrar.
 
 ## Pendiente
 
-No hay capturas reales de las aplicaciones. Cuando existan, entran como imagen a lo ancho dentro del bloque `.project`.
+Faltan capturas reales de `lingua-lens-app` y de `miwayomi`. Cuando existan, van al mismo bloque `.shots` dentro de su tarjeta.

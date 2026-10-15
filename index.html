@@ -386,6 +386,42 @@
     mask: url('https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/arrow-up-right.svg') center / contain no-repeat;
   }
 
+  .icon-dl {
+    -webkit-mask: url('https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/download.svg') center / contain no-repeat;
+    mask: url('https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/download.svg') center / contain no-repeat;
+  }
+
+  /* ---------- Caja: pieza destacada con capturas ---------- */
+  .caja-head {
+    display: grid;
+    gap: 1.6rem 3rem;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+    align-items: start;
+  }
+  .caja-head .snippet { margin-top: 1.4rem; }
+  .caja-proof {
+    display: grid;
+    gap: .85rem 3rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 2rem;
+  }
+  .shots { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .9rem; margin-top: 2.2rem; }
+  .shots img {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    border: 1px solid var(--shell-ring);
+    border-radius: 1.15rem;
+    background: var(--core-2);
+  }
+  .card-foot.pair { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+
+  @media (max-width: 900px) {
+    .caja-head { grid-template-columns: minmax(0, 1fr); }
+    .caja-proof { grid-template-columns: minmax(0, 1fr); gap: .85rem; }
+    .shots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
   /* ---------- Servicios ---------- */
   .service h3 { font-size: 1.06rem; letter-spacing: -.01em; }
   .service p { margin-top: .55rem; font-size: .95rem; color: var(--muted); }
@@ -658,7 +694,46 @@
           </div>
         </article>
 
-        <article class="shell cell-12 wide-cell reveal" style="--d:160ms">
+        <article class="shell cell-12 reveal" style="--d:160ms">
+          <div class="core">
+            <div class="caja-head">
+              <div>
+                <h3>Caja</h3>
+                <ul class="tags">
+                  <li>Kotlin</li>
+                  <li>Jetpack Compose</li>
+                  <li>Material 3</li>
+                  <li>Room</li>
+                </ul>
+                <div class="snippet">Cierre de hoy <b>→ saldo inicial de mañana</b><br>El saldo <em>se deriva de los movimientos</em>, nunca se guarda</div>
+              </div>
+              <div>
+                <p style="margin-top:0">Planilla de caja para el día a día de un negocio, como app nativa de Android. Cada cuenta lleva sus entradas y sus salidas, y el saldo se calcula solo: el cierre de un día es el saldo con el que abre el siguiente, sin copiar nada a mano.</p>
+              </div>
+            </div>
+
+            <ul class="proof caja-proof">
+              <li><span class="tick" aria-hidden="true">✓</span><span><strong>Continuidad sin copiar nada.</strong> El cierre de cada cuenta es, exactamente, el saldo inicial del día siguiente, calculado desde sus movimientos.</span></li>
+              <li><span class="tick" aria-hidden="true">✓</span><span><strong>Cargar en segundos.</strong> Una entrada o una salida son el monto y la cuenta; el detalle es opcional.</span></li>
+              <li><span class="tick" aria-hidden="true">✓</span><span><strong>Sin conexión y sin registrarse.</strong> Todo vive en el teléfono: no hay cuentas de usuario ni servidores.</span></li>
+              <li><span class="tick" aria-hidden="true">✓</span><span><strong>Tour guiado la primera vez.</strong> La app oscurece la pantalla y explica cada parte señalándola, sin manual.</span></li>
+            </ul>
+
+            <div class="shots">
+              <img src="assets/caja/dia.webp" width="720" height="1600" loading="lazy" decoding="async" alt="Pantalla del día: cierre total y planilla con una fila por cuenta">
+              <img src="assets/caja/detalle.webp" width="720" height="1600" loading="lazy" decoding="async" alt="Detalle de una cuenta: saldo inicial, cada movimiento y saldo final">
+              <img src="assets/caja/calendario.webp" width="720" height="1600" loading="lazy" decoding="async" alt="Calendario del mes con la evolución del saldo y una marca por día">
+              <img src="assets/caja/cuentas.webp" width="720" height="1600" loading="lazy" decoding="async" alt="Listado de cuentas con su saldo y el cambio de apariencia">
+            </div>
+
+            <p class="card-foot pair">
+              <a class="btn btn-primary" href="https://github.com/SeoMavares/caja/releases/latest/download/Caja-1.0.apk">Descargar la app <span class="disc"><span class="icon icon-dl" aria-hidden="true"></span></span></a>
+              <a class="go" href="https://github.com/SeoMavares/caja" target="_blank" rel="noopener noreferrer">Ver el repositorio <span class="disc"><span class="icon icon-ext" aria-hidden="true"></span></span></a>
+            </p>
+          </div>
+        </article>
+
+        <article class="shell cell-12 wide-cell reveal" style="--d:240ms">
           <div class="core">
             <h3>El código está abierto</h3>
             <div>

@@ -59,8 +59,10 @@ Constraints:
   (`https://forobeta.com/direct-messages/add?to=seomavares`). No email, phone
   or other social account was supplied, so none may appear. GitHub is a place to
   read the code, never the way to get in touch.
-- There are no product screenshots, client logos or testimonials in evidence.
-  Mock product UI and invented proof are prohibited.
+- There are real screenshots for one project only: `caja`, captured from the app
+  running on a physical phone and stored in `assets/caja/`. Every other project
+  still has no image, and mock product UI and invented proof are prohibited.
+  No client logos or testimonials are in evidence.
 
 ## Brand Commitments
 
@@ -90,13 +92,20 @@ Public, linkable:
 - `github.com/SeoMavares/lingua-lens-app`: Android translation app and launcher,
   Kotlin and Compose, ML Kit on-device engines, documented architecture in
   Spanish under `docs/`.
+- `github.com/SeoMavares/caja`: Android app in Kotlin and Compose, Room and
+  DataStore, published as a signed APK in the repository releases. Its four
+  screenshots in `assets/caja/` are the only real product images the site has.
 
 Private, no public link may be shown: a community management system, IPTV
 streaming suites (web and Android), live-data admin panels, and institutional
 websites. These may be described by domain, never by client name.
 
-Absent and not to be fabricated: screenshots, testimonials, client names,
-pricing, delivery timelines, team size beyond one developer.
+Real screenshots exist for `caja` only, in `assets/caja/`, and were captured
+from the app running on a physical phone. They are project evidence, not part of
+the site's own visual identity.
+
+Absent and not to be fabricated: screenshots for any other project, testimonials,
+client names, pricing, delivery timelines, team size beyond one developer.
 
 ## Product Principles
 
