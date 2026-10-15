@@ -87,6 +87,25 @@
   ::-webkit-scrollbar-thumb { background: #35353a; border: 3px solid var(--bg); border-radius: var(--pill); }
   ::-webkit-scrollbar-thumb:hover { background: #4a4a52; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+  a { text-underline-offset: .22em; text-decoration-thickness: from-font; }
+
+  /* Enlace de salto: invisible hasta que el teclado lo alcanza. */
+  .skip {
+    position: fixed;
+    top: .75rem;
+    left: .75rem;
+    z-index: calc(var(--z-menu) + 1);
+    padding: .7rem 1.1rem;
+    border-radius: var(--pill);
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-size: .9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transform: translateY(-200%);
+    transition: transform 400ms var(--ease-fluid);
+  }
+  .skip:focus-visible { transform: none; }
 
   h1, h2, h3, p, ul, li { margin: 0; }
   ul { padding: 0; list-style: none; }
@@ -203,20 +222,6 @@
     .shell:hover { border-color: var(--shell-ring-2); }
   }
 
-  /* ---------- Etiqueta de seccion ---------- */
-  .eyebrow {
-    display: inline-block;
-    padding: .4rem .8rem .45rem;
-    border: 1px solid var(--shell-ring);
-    border-radius: var(--pill);
-    background: var(--shell-bg);
-    font-size: .6875rem;
-    font-weight: 500;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
   /* ---------- Doble bisel ---------- */
   .shell {
     display: flex;
@@ -240,7 +245,6 @@
   /* ---------- Portada ---------- */
   .hero { padding-block: clamp(5rem, 12vw, 9rem) clamp(4rem, 9vw, 7rem); }
   .hero h1 {
-    margin-top: 1.6rem;
     font-size: clamp(2.7rem, 1.1rem + 5.6vw, 5.6rem);
     line-height: .98;
     letter-spacing: -.035em;
@@ -293,7 +297,7 @@
   }
 
   /* ---------- Secciones ---------- */
-  .section { padding-block: clamp(4rem, 9vw, 7rem); }
+  .section { padding-block: clamp(4rem, 9vw, 7rem); scroll-margin-top: 6rem; }
   .section-head { display: grid; gap: 1.1rem; justify-items: start; margin-bottom: clamp(2.25rem, 5vw, 3.5rem); }
   h2 {
     font-size: clamp(1.9rem, 1.3rem + 2.2vw, 3rem);
@@ -434,26 +438,26 @@
 
   /* ---------- Encargos ---------- */
   .others li {
+    position: relative;
     display: grid;
     gap: .35rem 2rem;
     align-items: baseline;
     padding-block: 1.25rem;
-    border-top: 1px solid var(--shell-ring);
   }
-  .others li:first-child { border-top: 0; padding-top: 0; }
+  .others li::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    block-size: 1px;
+    background: var(--shell-ring);
+    transform-origin: 0 50%;
+    transform: scaleX(1);
+  }
+  .others li:first-child::before { display: none; }
+  .others li:first-child { padding-top: 0; }
   .others h3 { font-size: 1.05rem; }
   .others p { font-size: .95rem; color: var(--muted); margin: 0; }
-  .tag-private {
-    justify-self: start;
-    padding: .45rem .75rem;
-    border: 1px solid var(--shell-ring);
-    border-radius: var(--pill);
-    background: var(--shell-bg);
-    font-size: .72rem;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
 
   /* ---------- Contacto ---------- */
   .contact { padding-block: clamp(4rem, 9vw, 7rem); }
@@ -539,21 +543,70 @@
   .menu.is-open a:nth-child(2) { transition-delay: 160ms; }
   .menu.is-open a:nth-child(3) { transition-delay: 220ms; }
 
-  /* ---------- Entrada al hacer scroll: nada aparece quieto ---------- */
-  .js .reveal {
-    opacity: 0;
-    transform: translateY(3rem);
-    filter: blur(8px);
+  /* ---------- Entrada al hacer scroll ----------
+     Un vocabulario corto en vez de un solo efecto repetido en cada bloque: los
+     titulares se escriben, las tarjetas se asientan, las capturas aparecen y las
+     filas de la lista dibujan su filete. Todo cuelga de .reveal, y sin JavaScript
+     (o con el movimiento reducido) el contenido ya esta visible. */
+  .js .reveal { opacity: 0; }
+  .js .reveal.is-in { opacity: 1; }
+
+  /* Titulares: el texto sube desde detras de su propio recorte. El recorte vive
+     en un hijo, nunca en el elemento observado: un elemento recortado a cero no
+     intersecta y su entrada no se dispararia jamas. */
+  .js .reveal.lift { opacity: 1; overflow: hidden; padding-bottom: .14em; margin-bottom: -.14em; }
+  .js .reveal.lift > span { display: block; transform: translateY(110%); }
+  .js .reveal.lift.is-in > span {
+    transform: none;
+    transition: transform 950ms var(--ease-out) var(--d, 0ms);
   }
-  .js .reveal.is-in {
+
+  /* Tarjetas y bloques: llegan desenfocados y se asientan. */
+  .js .reveal.settle { transform: translateY(2.4rem) scale(.988); filter: blur(6px); }
+  .js .reveal.settle.is-in {
     opacity: 1;
     transform: none;
     filter: blur(0);
-    transition: opacity 900ms var(--ease-fluid), transform 900ms var(--ease-fluid), filter 900ms var(--ease-fluid);
-    transition-delay: var(--d, 0ms);
+    transition: opacity 780ms var(--ease-out) var(--d, 0ms),
+                transform 900ms var(--ease-out) var(--d, 0ms),
+                filter 720ms var(--ease-out) var(--d, 0ms);
   }
+
+  /* Capturas: entran mas despacio que el resto, como si enfocaran. */
+  .js .reveal.expose { transform: translateY(1.5rem) scale(.985); filter: blur(12px); }
+  .js .reveal.expose.is-in {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+    transition: opacity 700ms var(--ease-out) var(--d, 0ms),
+                transform 1100ms var(--ease-out) var(--d, 0ms),
+                filter 1000ms var(--ease-out) var(--d, 0ms);
+  }
+
+  /* Panel del indice: entra desde el costado de la portada. */
+  .js .reveal.aside-in { transform: translateX(2.2rem) scale(.985); }
+  .js .reveal.aside-in.is-in {
+    opacity: 1;
+    transform: none;
+    transition: opacity 700ms var(--ease-out) var(--d, 0ms),
+                transform 1000ms var(--ease-out) var(--d, 0ms);
+  }
+
+  /* Filas de la lista: el texto sube detras del filete que se dibuja. */
+  .js .reveal.draw { transform: translateY(1.1rem); }
+  .js .reveal.draw.is-in {
+    opacity: 1;
+    transform: none;
+    transition: opacity 560ms var(--ease-out) var(--d, 0ms),
+                transform 720ms var(--ease-out) var(--d, 0ms);
+  }
+  .js .others li.is-in::before { transform: scaleX(1); transition: transform 900ms var(--ease-fluid) var(--d, 0ms); }
+
   @media (prefers-reduced-motion: reduce) {
     .js .reveal { opacity: 1; transform: none; filter: none; transition: none; }
+    .js .reveal.lift { overflow: visible; padding-bottom: 0; margin-bottom: 0; }
+    .js .reveal.lift > span { transform: none; transition: none; }
+    .js .others li::before { transform: none; transition: none; }
     .menu a { opacity: 1; transform: none; }
     html { scroll-behavior: auto; }
     .btn:active, .go:active { transform: none; }
@@ -574,7 +627,7 @@
     .cell-8 { grid-column: span 8; }
     .cell-12 { grid-column: span 12; }
     .wide-cell .core { display: grid; gap: 1.25rem 3rem; grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); align-items: start; }
-    .others li { grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) auto; }
+    .others li { grid-template-columns: minmax(0, .8fr) minmax(0, 1.6fr); }
   }
   @media (max-width: 767px) {
     :root { --shell-r: 1.5rem; }
@@ -586,6 +639,8 @@
 </style>
 </head>
 <body>
+
+<a class="skip" href="#top">Saltar al contenido</a>
 
 <div class="glow" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
@@ -609,16 +664,15 @@
 
     <section class="hero wrap">
       <div class="hero-copy">
-        <span class="eyebrow reveal" style="--d:0ms">Android, backend y web</span>
-        <h1 class="reveal" style="--d:80ms">Software a medida para tu negocio</h1>
-        <p class="sub reveal" style="--d:180ms">Diseño, construyo y publico apps Android, backends y paneles web. Sin intermediarios: hablas siempre con quien escribe el código.</p>
-        <div class="actions reveal" style="--d:260ms">
+        <h1 class="reveal lift" style="--d:0ms"><span>Software a medida para tu negocio</span></h1>
+        <p class="sub reveal settle" style="--d:200ms">Diseño, construyo y publico apps Android, backends y paneles web. Sin intermediarios: hablas siempre con quien escribe el código.</p>
+        <div class="actions reveal settle" style="--d:320ms">
           <a class="btn btn-primary" href="https://forobeta.com/direct-messages/add?to=seomavares" target="_blank" rel="noopener noreferrer">Enviarme un mensaje <span class="disc"><span class="icon icon-ext" aria-hidden="true"></span></span></a>
           <a class="btn btn-ghost" href="#trabajo">Ver el trabajo <span class="disc"><span class="icon icon-ext" aria-hidden="true"></span></span></a>
         </div>
       </div>
 
-      <aside class="shell hero-index reveal" style="--d:340ms" aria-label="Trabajo destacado">
+      <aside class="shell hero-index reveal aside-in" style="--d:440ms" aria-label="Trabajo destacado">
         <div class="core">
           <p class="index-title">Trabajo destacado</p>
           <ul class="index-rows">
@@ -649,14 +703,13 @@
     </section>
 
     <section id="trabajo" class="section wrap">
-      <div class="section-head reveal">
-        <span class="eyebrow">Proyectos publicados</span>
-        <h2>Trabajo</h2>
-        <p>Trabajo publicado y en uso real, además de los encargos que hago para clientes.</p>
+      <div class="section-head">
+        <h2 class="reveal lift" style="--d:0ms"><span>Trabajo</span></h2>
+        <p class="reveal settle" style="--d:140ms">Trabajo publicado y en uso real, además de los encargos que hago para clientes.</p>
       </div>
 
       <div class="bento">
-        <article class="shell cell-7 reveal" style="--d:0ms">
+        <article class="shell cell-7 reveal settle" style="--d:0ms">
           <div class="core">
             <div>
               <h3>LinguaLens</h3>
@@ -680,7 +733,7 @@
           </div>
         </article>
 
-        <article class="shell cell-5 reveal" style="--d:80ms">
+        <article class="shell cell-5 reveal settle" style="--d:80ms">
           <div class="core">
             <h3>miwayomi</h3>
             <p>Servidor que ejecuta en el ordenador las extensiones de Android de Tachiyomi y Aniyomi, sin emulador y sin teléfono, y las publica como API y como interfaz web.</p>
@@ -700,10 +753,10 @@
           </div>
         </article>
 
-        <article class="shell cell-12 reveal" style="--d:160ms">
+        <article class="shell cell-12">
           <div class="core">
             <div class="caja-head">
-              <div>
+              <div class="reveal settle">
                 <h3>Caja</h3>
                 <ul class="tags">
                   <li>Kotlin</li>
@@ -711,14 +764,14 @@
                   <li>Material 3</li>
                   <li>Room</li>
                 </ul>
-                <div class="snippet">Cierre de hoy <b>→ saldo inicial de mañana</b><br>El saldo <em>se deriva de los movimientos</em>, nunca se guarda</div>
+                <div class="snippet"><b>saldo inicial(hoy)</b> = saldo final(ayer)<br><b>saldo final(hoy)</b> = inicial + entradas - salidas</div>
               </div>
-              <div>
+              <div class="reveal settle" style="--d:120ms">
                 <p style="margin-top:0">Planilla de caja para el día a día de un negocio, como app nativa de Android. Cada cuenta lleva sus entradas y sus salidas, y el saldo se calcula solo: el cierre de un día es el saldo con el que abre el siguiente, sin copiar nada a mano.</p>
               </div>
             </div>
 
-            <ul class="proof caja-proof">
+            <ul class="proof caja-proof reveal settle" style="--d:200ms">
               <li><span class="tick" aria-hidden="true">✓</span><span><strong>Continuidad sin copiar nada.</strong> El cierre de cada cuenta es, exactamente, el saldo inicial del día siguiente, calculado desde sus movimientos.</span></li>
               <li><span class="tick" aria-hidden="true">✓</span><span><strong>Cargar en segundos.</strong> Una entrada o una salida son el monto y la cuenta; el detalle es opcional.</span></li>
               <li><span class="tick" aria-hidden="true">✓</span><span><strong>Sin conexión y sin registrarse.</strong> Todo vive en el teléfono: no hay cuentas de usuario ni servidores.</span></li>
@@ -726,23 +779,23 @@
             </ul>
 
             <div class="shots">
-              <img src="assets/caja/dia.webp" width="720" height="1600" loading="lazy" decoding="async" alt="Pantalla del día: cierre total y planilla con una fila por cuenta">
-              <img src="assets/caja/detalle.webp" width="720" height="1600" loading="lazy" decoding="async" alt="Detalle de una cuenta: saldo inicial, cada movimiento y saldo final">
-              <img src="assets/caja/calendario.webp" width="720" height="1600" loading="lazy" decoding="async" alt="Calendario del mes con la evolución del saldo y una marca por día">
-              <img src="assets/caja/cuentas.webp" width="720" height="1600" loading="lazy" decoding="async" alt="Listado de cuentas con su saldo y el cambio de apariencia">
+              <img class="reveal expose" style="--d:0ms" src="assets/caja/dia.webp" width="720" height="1600" loading="lazy" decoding="async" alt="Pantalla del día: cierre total y planilla con una fila por cuenta">
+              <img class="reveal expose" style="--d:90ms" src="assets/caja/detalle.webp" width="720" height="1600" loading="lazy" decoding="async" alt="Detalle de una cuenta: saldo inicial, cada movimiento y saldo final">
+              <img class="reveal expose" style="--d:180ms" src="assets/caja/calendario.webp" width="720" height="1600" loading="lazy" decoding="async" alt="Calendario del mes con la evolución del saldo y una marca por día">
+              <img class="reveal expose" style="--d:270ms" src="assets/caja/cuentas.webp" width="720" height="1600" loading="lazy" decoding="async" alt="Listado de cuentas con su saldo y el cambio de apariencia">
             </div>
 
-            <p class="card-foot pair">
+            <p class="card-foot pair reveal settle" style="--d:120ms">
               <a class="btn btn-primary" href="assets/caja/Caja-1.0.apk" download>Descargar la app <span class="disc"><span class="icon icon-dl" aria-hidden="true"></span></span></a>
             </p>
           </div>
         </article>
 
-        <article class="shell cell-12 wide-cell reveal" style="--d:240ms">
+        <article class="shell cell-12 wide-cell reveal settle" style="--d:240ms">
           <div class="core">
             <h3>Abierto donde suma, tuyo donde importa</h3>
             <div>
-              <p style="margin-top:0">miwayomi es de código abierto y puedes leer cómo está hecho antes de escribirme, con la documentación de sus decisiones. El trabajo que hago por encargo queda privado: el código es de quien lo paga, y se entrega documentado.</p>
+              <p style="margin-top:0">miwayomi es de código abierto y puedes leer cómo está hecho antes de escribirme, con las decisiones documentadas. Los encargos corren en privado, se entregan documentados y listos para publicar.</p>
               <ul class="tags">
                 <li>Licencia Apache</li>
                 <li>Documentación técnica</li>
@@ -755,44 +808,43 @@
     </section>
 
     <section id="servicios" class="section wrap">
-      <div class="section-head reveal">
-        <span class="eyebrow">Lo que hago</span>
-        <h2>Servicios</h2>
-        <p>Coger una idea y devolver algo publicado, sin repartir el trabajo entre varios proveedores.</p>
+      <div class="section-head">
+        <h2 class="reveal lift" style="--d:0ms"><span>Servicios</span></h2>
+        <p class="reveal settle" style="--d:140ms">Tomar una idea y devolverla publicada, sin repartir el trabajo entre varios proveedores.</p>
       </div>
 
       <div class="bento">
-        <div class="shell cell-4 service reveal" style="--d:0ms">
+        <div class="shell cell-4 service reveal settle" style="--d:0ms">
           <div class="core">
             <h3>Apps Android</h3>
             <p>Aplicaciones nativas en Kotlin con Jetpack Compose, listas para publicar en Play.</p>
           </div>
         </div>
-        <div class="shell cell-4 service reveal" style="--d:80ms">
+        <div class="shell cell-4 service reveal settle" style="--d:80ms">
           <div class="core">
             <h3>Backends y APIs</h3>
             <p>Servicios en Kotlin y Ktor o en Node.js, con base de datos, autenticación y API documentada.</p>
           </div>
         </div>
-        <div class="shell cell-4 service reveal" style="--d:160ms">
+        <div class="shell cell-4 service reveal settle" style="--d:160ms">
           <div class="core">
             <h3>Paneles de gestión</h3>
             <p>Herramientas web para que tu equipo administre datos, contenidos o clientes sin depender de nadie.</p>
           </div>
         </div>
-        <div class="shell cell-6 service reveal" style="--d:0ms">
+        <div class="shell cell-6 service reveal settle" style="--d:0ms">
           <div class="core">
             <h3>Inteligencia artificial</h3>
             <p>Funciones de IA conectadas a tu negocio, con proveedor intercambiable y alternativa cuando no hay red.</p>
           </div>
         </div>
-        <div class="shell cell-3 service reveal" style="--d:80ms">
+        <div class="shell cell-3 service reveal settle" style="--d:80ms">
           <div class="core">
             <h3>Vídeo y datos</h3>
             <p>Reproducción en streaming y procesado de documentos por lotes.</p>
           </div>
         </div>
-        <div class="shell cell-3 service reveal" style="--d:160ms">
+        <div class="shell cell-3 service reveal settle" style="--d:160ms">
           <div class="core">
             <h3>Publicación</h3>
             <p>Compilación, contenedores y despliegue automático, con el código en tu poder.</p>
@@ -802,39 +854,33 @@
     </section>
 
     <section id="encargos" class="section wrap">
-      <div class="section-head reveal">
-        <span class="eyebrow">Encargos</span>
-        <h2>Clientes</h2>
-        <p>Proyectos entregados cuyo código pertenece al cliente y no se publica. Van descritos por tipo de trabajo.</p>
+      <div class="section-head">
+        <h2 class="reveal lift" style="--d:0ms"><span>Clientes</span></h2>
+        <p class="reveal settle" style="--d:140ms">Proyectos entregados cuyo código pertenece al cliente y no se publica. Van descritos por tipo de trabajo.</p>
       </div>
 
-      <div class="shell cell-12 reveal">
+      <div class="shell cell-12">
         <div class="core">
           <ul class="others">
-            <li>
+            <li class="reveal draw" style="--d:0ms">
               <h3>Gestión de comunidades</h3>
               <p>Panel de administración y web pública para el día a día de una comunidad de vecinos.</p>
-              <span class="tag-private">Privado</span>
             </li>
-            <li>
+            <li class="reveal draw" style="--d:70ms">
               <h3>Suite de televisión por internet</h3>
               <p>Aplicación web y aplicación Android sobre la misma fuente de canales y listas.</p>
-              <span class="tag-private">Privado</span>
             </li>
-            <li>
+            <li class="reveal draw" style="--d:140ms">
               <h3>Paneles con datos en vivo</h3>
               <p>Administración de contenidos y resultados deportivos que se actualizan solos.</p>
-              <span class="tag-private">Privado</span>
             </li>
-            <li>
+            <li class="reveal draw" style="--d:210ms">
               <h3>Webs institucionales</h3>
               <p>Web de centro educativo y páginas de evento, sin dependencias y con carga inmediata.</p>
-              <span class="tag-private">Privado</span>
             </li>
-            <li>
+            <li class="reveal draw" style="--d:280ms">
               <h3>Herramientas internas</h3>
               <p>Utilidades en Go para tareas repetitivas y procesado de archivos por lotes.</p>
-              <span class="tag-private">Privado</span>
             </li>
           </ul>
         </div>
@@ -842,12 +888,11 @@
     </section>
 
     <section id="contacto" class="section contact wrap">
-      <div class="shell reveal">
+      <div class="shell">
         <div class="core">
-          <span class="eyebrow">Hablemos</span>
-          <h2 style="margin-top:1.4rem">Cuéntame qué tienes que construir</h2>
-          <p>Escríbeme por mensaje directo en ForoBeta y te contesto con un alcance y un precio concretos. Si prefieres ver antes cómo trabajo, el código de mis proyectos está en GitHub.</p>
-          <div class="actions">
+          <h2 class="reveal lift" style="--d:0ms"><span>Cuéntame qué tienes que construir</span></h2>
+          <p class="reveal settle" style="--d:140ms">Escríbeme por mensaje directo en ForoBeta y te contesto con un alcance y un precio concretos. Si prefieres ver antes cómo trabajo, miwayomi está abierto en GitHub.</p>
+          <div class="actions reveal settle" style="--d:280ms">
             <a class="btn btn-primary" href="https://forobeta.com/direct-messages/add?to=seomavares" target="_blank" rel="noopener noreferrer">Enviarme un mensaje <span class="disc"><span class="icon icon-ext" aria-hidden="true"></span></span></a>
           </div>
         </div>
@@ -908,12 +953,15 @@
   const burger = document.querySelector('.burger');
   const menu = document.getElementById('menu');
   const menuLinks = menu.querySelectorAll('a');
+  const page = document.querySelector('.page');
 
   function setMenu(open) {
     burger.setAttribute('aria-expanded', String(open));
     burger.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
     menu.classList.toggle('is-open', open);
     document.body.style.overflow = open ? 'hidden' : '';
+    /* Con la capa abierta, el resto de la pagina sale del orden de tabulacion. */
+    page.inert = open;
     if (open) {
       /* El foco necesita dos fotogramas: la capa aun era invisible en este paso. */
       requestAnimationFrame(function () {
