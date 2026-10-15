@@ -88,21 +88,21 @@ Public, linkable:
   29 stars, 2 forks, open issues, GHCR images, Docker Compose. Loads
   Tachiyomi/Aniyomi extensions by converting DEX with dex2jar, repairing the
   bytecode with JarFixer, and loading classes through a child-first
-  ClassLoader.
-- `github.com/SeoMavares/lingua-lens-app`: Android translation app and launcher,
-  Kotlin and Compose, ML Kit on-device engines, documented architecture in
-  Spanish under `docs/`.
-- `github.com/SeoMavares/caja`: el repositorio es privado, así que ningún enlace
-  puede apuntar a él. La app se ofrece como descarga directa desde este mismo
-  sitio (`assets/caja/Caja-1.0.apk`), y sus cuatro capturas en `assets/caja/` son
-  las únicas imágenes reales de producto que tiene el sitio.
+  ClassLoader. It is the only repository that stays public, and therefore the
+  only source link the site may show.
+- `play.google.com/store/apps/details?id=lat.nexotv.lingualens`: LinguaLens
+  published on Google Play, with a live listing in Spanish. This listing is the
+  public evidence for the app and the action its card points at; because the
+  repository is private, no GitHub link for it may appear anywhere, including
+  the hero index and the footer.
 
-Private, no public link may be shown: the `caja` repository, a community
-management system, IPTV streaming suites (web and Android), live-data admin
-panels, and institutional websites. The private client work may be described by
-domain, never by client name. `caja` is the exception in how it is shown: it
-keeps a full card with copy and screenshots, and is offered as a direct APK
-download instead of a source link.
+Private, no public link may be shown: the `caja` and `lingua-lens-app`
+repositories, a community management system, IPTV streaming suites (web and
+Android), live-data admin panels, and institutional websites. The private client
+work may be described by domain, never by client name. `caja` and
+`lingua-lens-app` are the exception in how they are shown: they keep a full card
+with copy and proof, but the source is never linked, and the store or download
+link takes the place of the repository link.
 
 Real screenshots exist for `caja` only, in `assets/caja/`, and were captured
 from the app running on a physical phone. They are project evidence, not part of

@@ -21,8 +21,15 @@ Copia un bloque `<article class="shell cell-12 reveal">` y cambia el título, el
 
 Las capturas van en `assets/<proyecto>/`, en WebP de 720 px de ancho, y se colocan dentro de un `<div class="shots">`. Caja es el único proyecto con capturas reales; ninguna imagen inventada puede entrar.
 
-Si un proyecto no tiene repositorio público, el pie de la tarjeta lleva solo el botón de descarga (`<a class="btn btn-primary" href="assets/<proyecto>/<apk>" download>`) y ningún enlace a GitHub. El APK se guarda junto a las capturas y no se versiona ninguna versión anterior: se reemplaza el archivo y se actualiza el nombre en el enlace.
+Si un proyecto no tiene repositorio público, el pie de la tarjeta lleva la acción pública que sí existe y ningún enlace a GitHub:
+
+- **Publicado en una tienda:** botón `.btn.btn-primary` con el ícono `icon-play` y la URL del listado (como LinguaLens en Google Play).
+- **Sin tienda:** botón `.btn.btn-primary` con el ícono `icon-dl` y el APK guardado junto a las capturas (como Caja).
+
+El APK no acumula versiones: se reemplaza el archivo y se actualiza el nombre en el enlace.
 
 ## Pendiente
 
 Faltan capturas reales de `lingua-lens-app` y de `miwayomi`. Cuando existan, van al mismo bloque `.shots` dentro de su tarjeta.
+
+Los repositorios de `caja` y `lingua-lens-app` tienen que estar en privado en GitHub para que este sitio sea coherente: acá no se enlaza el código de ninguno de los dos.
