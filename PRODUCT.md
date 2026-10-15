@@ -92,13 +92,17 @@ Public, linkable:
 - `github.com/SeoMavares/lingua-lens-app`: Android translation app and launcher,
   Kotlin and Compose, ML Kit on-device engines, documented architecture in
   Spanish under `docs/`.
-- `github.com/SeoMavares/caja`: Android app in Kotlin and Compose, Room and
-  DataStore, published as a signed APK in the repository releases. Its four
-  screenshots in `assets/caja/` are the only real product images the site has.
+- `github.com/SeoMavares/caja`: el repositorio es privado, así que ningún enlace
+  puede apuntar a él. La app se ofrece como descarga directa desde este mismo
+  sitio (`assets/caja/Caja-1.0.apk`), y sus cuatro capturas en `assets/caja/` son
+  las únicas imágenes reales de producto que tiene el sitio.
 
-Private, no public link may be shown: a community management system, IPTV
-streaming suites (web and Android), live-data admin panels, and institutional
-websites. These may be described by domain, never by client name.
+Private, no public link may be shown: the `caja` repository, a community
+management system, IPTV streaming suites (web and Android), live-data admin
+panels, and institutional websites. The private client work may be described by
+domain, never by client name. `caja` is the exception in how it is shown: it
+keeps a full card with copy and screenshots, and is offered as a direct APK
+download instead of a source link.
 
 Real screenshots exist for `caja` only, in `assets/caja/`, and were captured
 from the app running on a physical phone. They are project evidence, not part of
